@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Human Typing Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f0f2f5;
+    }
+    .chat-box {
+      width: 100%;
+      max-width: 600px;
+      min-height: 150px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 16px;
+      line-height: 1.5;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      outline: none;
+    }
+    .chat-box:focus {
+      border-color: #25D366;
+      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #25D366;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1ebe5d;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h2>Human Typing Simulator Test</h2>
+  <p>Click the button below to watch the algorithm type out a sample message exactly as it would in WhatsApp Web.</p>
+  
+  <div id="inputBox" class="chat-box" contenteditable="true" data-tab="10" role="textbox"></div>
+  
+  <button id="startBtn">Start Typing Test</button>
+
+  <script>
+    async function simulateHumanTyping(input, text) {
+      let burstCounter = 0;
+
+      const getHumanDelay = (c) => {
+        if (c === '\n') return 300 + Math.random() * 500;
+        
+        const symbols = ".,;{}()[]\"':\\/<>*&^%$#@!~`_+-=";
+        if (symbols.includes(c)) return 150 + Math.random() * 200;
+        
+        if (c === ' ') return 100 + Math.random() * 100;
+
+        if (burstCounter > 0) {
+          burstCounter--;
+          return 40 + Math.random() * 30;
+        }
+
+        if (Math.random() < 0.1) {
+          burstCounter = 3 + Math.floor(Math.random() * 5);
+          return 40 + Math.random() * 30;
+        }
+
+        const rand = Math.random();
+        if (rand <= 0.15) return 250 + Math.random() * 200;
+        if (rand <= 0.40) return 150 + Math.random() * 100;
+        return 80 + Math.random() * 70;
+      };
+
+      const getAdjacentTypo = (c) => {
+        const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+        const lower = c.toLowerCase();
+        
+        for (const row of rows) {
+          const idx = row.indexOf(lower);
+          if (idx !== -1) {
+            const shift = Math.random() < 0.5 ? 1 : -1;
+            let newIdx = idx + shift;
+            if (newIdx < 0) newIdx = 1;
+            if (newIdx >= row.length) newIdx = row.length - 2;
+            
+            const typo = row[newIdx];
+            return c === c.toUpperCase() ? typo.toUpperCase() : typo;
+          }
+        }
+        return c;
+      };
+
+      input.focus();
+
+      for (const char of text) {
+        if (char === '\r') continue;
+        
+        // 6% chance for adjacent typo on letters
+        if (char.length === 1 && char.match(/[a-z]/i) && Math.random() <= 0.06) {
+          const typo = getAdjacentTypo(char);
+          if (typo !== char) {
+            document.execCommand("insertText", false, typo);
+            await new Promise(res => setTimeout(res, 250 + Math.random() * 200)); // realize mistake
+            document.execCommand("delete", false); // backspace
+            await new Promise(res => setTimeout(res, 100 + Math.random() * 100)); // pause before correct key
+          }
+        }
+        
+        if (char === '\n') {
+          document.execCommand("insertLineBreak", false);
+        } else {
+          document.execCommand("insertText", false, char);
+        }
+        
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        await new Promise(res => setTimeout(res, getHumanDelay(char)));
+      }
+    }
+
+    const btn = document.getElementById('startBtn');
+    const input = document.getElementById('inputBox');
+
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.innerText = "Typing...";
+      input.innerHTML = "";
+      
+      const sampleText = "Hi *Jay Maa Laxmi Refrigeration*, I noticed you don't have a website yet.\n\nI know that for a AC Repair business, the biggest challenge is getting consistent emergency bookings online. A professional website solves this by allowing direct calls directly from Google.\n\nWe recently built one for a competitor in your area and they've seen great growth. Can I send you a free demo mockup I made for *Jay Maa Laxmi Refrigeration*?";
+      
+      await simulateHumanTyping(input, sampleText);
+      
+      btn.disabled = false;
+      btn.innerText = "Start Typing Test";
+    });
+  </script>
+</body>
+</html>
