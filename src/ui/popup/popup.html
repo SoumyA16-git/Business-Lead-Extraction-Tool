@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=380, initial-scale=1.0">
+  <title>Business Lead Extraction Tool</title>
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app" class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="app-title">BUSINESS LEAD EXTRACTION TOOL</div>
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <button id="btn-reset-session" type="button" class="icon-btn" aria-label="Reset or start new search" title="Reset / New Search"></button>
+        <button id="btn-settings" type="button" class="icon-btn" aria-label="Open Settings" title="Settings"></button>
+      </div>
+    </header>
+
+    <!-- Context Bar -->
+    <div class="context-bar">
+      <span id="platform-pill" class="chip chip-neutral">Google Maps</span>
+      <span id="context-status-text" class="status-indicator">
+        <span class="status-dot"></span> <span id="status-label">Detecting...</span>
+      </span>
+    </div>
+
+    <!-- Mode Switcher -->
+    <div class="mode-tabs">
+      <button id="tab-mode-search" type="button" class="mode-tab active" data-mode="search">
+        Search Leads
+      </button>
+      <button id="tab-mode-media" type="button" class="mode-tab" data-mode="media">
+        Media &amp; Reviews
+      </button>
+      <button id="tab-mode-linkedin" type="button" class="mode-tab" data-mode="linkedin">
+        LinkedIn Connect
+      </button>
+    </div>
+
+    <!-- Main View Area -->
+    <main class="popup-main">
+      <!-- Search Mode Container -->
+      <div id="search-mode-container">
+        <!-- Search Context -->
+        <section class="search-section">
+          <div id="search-query" class="search-query" title="Search query">No active search detected</div>
+          <div id="detected-count" class="detected-count">0 businesses discovered</div>
+        </section>
+
+        <!-- Alert Banner (Verification / Errors) -->
+        <div id="alert-banner" class="alert-banner" style="display: none;">
+          <span id="alert-icon"></span>
+          <div id="alert-text"></div>
+        </div>
+
+        <!-- Progress Section -->
+        <section class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">Progress</span>
+            <span id="progress-fraction" class="progress-fraction tabular-nums">0 / 0</span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Successful</span>
+              <span id="stat-successful" class="stat-value text-success tabular-nums">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Partial</span>
+              <span id="stat-partial" class="stat-value text-warning tabular-nums">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Failed</span>
+              <span id="stat-failed" class="stat-value text-error tabular-nums">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Duplicate</span>
+              <span id="stat-duplicate" class="stat-value text-neutral tabular-nums">0</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Speed Mode Selector -->
+        <section class="speed-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+            <span class="field-label" style="font-size: 10px; font-weight: 600; color: var(--color-text-secondary);">EXTRACTION SPEED</span>
+            <span id="live-speed-badge" class="chip chip-success" style="font-size: 9px; padding: 1px 5px;">Human (5-10s)</span>
+          </div>
+          <div class="speed-presets-group">
+            <button id="btn-speed-turbo" type="button" class="btn-speed-preset" data-speed="turbo">Turbo (2-5s)</button>
+            <button id="btn-speed-fast" type="button" class="btn-speed-preset" data-speed="fast">Fast (4-7s)</button>
+            <button id="btn-speed-standard" type="button" class="btn-speed-preset active" data-speed="standard">Human (5-10s)</button>
+          </div>
+        </section>
+
+        <!-- Extraction Controls -->
+        <section class="controls-section">
+          <button id="btn-start" type="button" class="btn btn-primary btn-full">Start Extraction</button>
+          <div id="running-controls" class="btn-group" style="display: none;">
+            <button id="btn-pause" type="button" class="btn btn-secondary">Pause</button>
+            <button id="btn-stop" type="button" class="btn btn-secondary">Stop</button>
+          </div>
+          <div id="paused-controls" class="btn-group" style="display: none;">
+            <button id="btn-resume" type="button" class="btn btn-primary">Resume</button>
+            <button id="btn-stop-paused" type="button" class="btn btn-secondary">Stop</button>
+          </div>
+        </section>
+
+        <!-- Lead Intelligence & Qualification Breakdown -->
+        <section id="lead-intelligence-section" class="lead-intel-section">
+          <div class="lead-intel-header">
+            <span class="section-title">LEAD INTELLIGENCE</span>
+            <span id="intel-count-total" class="chip chip-neutral tabular-nums" style="font-size: 10px;">0 Leads</span>
+          </div>
+
+          <!-- Category Group: Online Presence -->
+          <div class="intel-group">
+            <div class="intel-group-label">ONLINE PRESENCE</div>
+            <div class="intel-grid-3">
+              <div class="intel-pill">
+                <span class="intel-pill-label">Website</span>
+                <span id="count-website" class="intel-pill-value tabular-nums">0</span>
+              </div>
+              <div class="intel-pill">
+                <span class="intel-pill-label">Social Only</span>
+                <span id="count-social" class="intel-pill-value tabular-nums">0</span>
+              </div>
+              <div class="intel-pill">
+                <span class="intel-pill-label">No Website</span>
+                <span id="count-no-website" class="intel-pill-value tabular-nums">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Group: Contactability & Profile -->
+          <div class="intel-group">
+            <div class="intel-group-label">CONTACT & PROFILE</div>
+            <div class="intel-grid-3">
+              <div class="intel-pill">
+                <span class="intel-pill-label">Phone Direct</span>
+                <span id="count-phone-direct" class="intel-pill-value text-success tabular-nums">0</span>
+              </div>
+              <div class="intel-pill">
+                <span class="intel-pill-label">Full Contact</span>
+                <span id="count-full-contact" class="intel-pill-value tabular-nums">0</span>
+              </div>
+              <div class="intel-pill">
+                <span class="intel-pill-label">Complete GBP</span>
+                <span id="count-complete-gbp" class="intel-pill-value tabular-nums">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Group: Reputation -->
+          <div class="intel-group">
+            <div class="intel-group-label">REPUTATION & REVIEWS</div>
+            <div class="intel-grid-3">
+              <div class="intel-pill">
+                <span class="intel-pill-label">4.5+ Stars</span>
+                <span id="count-rating-high" class="intel-pill-value tabular-nums">0</span>
+              </div>
+              <div class="intel-pill">
+                <span class="intel-pill-label">100+ Reviews</span>
+                <span id="count-reviews-high" class="intel-pill-value tabular-nums">0</span>
+              </div>
+              <div class="intel-pill">
+                <span class="intel-pill-label">Needs Repair</span>
+                <span id="count-reputation-repair" class="intel-pill-value text-warning tabular-nums">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Group: Key Opportunities -->
+          <div class="intel-group">
+            <div class="intel-group-label">TOP OPPORTUNITIES</div>
+            <div class="intel-grid-2">
+              <div class="intel-pill intel-pill-highlight">
+                <span class="intel-pill-label">High Rev · No Site</span>
+                <span id="count-opp-rev-no-site" class="intel-pill-value text-accent tabular-nums">0</span>
+              </div>
+              <div class="intel-pill intel-pill-highlight">
+                <span class="intel-pill-label">High Rate · No Site</span>
+                <span id="count-opp-rate-no-site" class="intel-pill-value text-accent tabular-nums">0</span>
+              </div>
+            </div>
+          </div>
+
+          <button id="btn-open-lead-intelligence" type="button" class="btn btn-secondary btn-full" style="margin-top: 6px;">
+            Open Lead Intelligence Dashboard
+          </button>
+        </section>
+
+        <!-- Export & Dashboard Navigation -->
+        <section class="export-section">
+          <div class="btn-group">
+            <button id="btn-export-csv" type="button" class="btn btn-secondary">Export CSV</button>
+            <button id="btn-export-json" type="button" class="btn btn-secondary">Export JSON</button>
+          </div>
+          <button id="btn-open-dashboard" type="button" class="link-btn">Open Full Dashboard</button>
+        </section>
+      </div>
+
+      <!-- Media & Reviews Mode Container -->
+      <div id="media-mode-container" style="display: none; flex-direction: column; gap: var(--space-3);">
+        <!-- Detected Business Card (PRD §7.3) -->
+        <div id="detected-biz-card" class="detected-biz-card" style="display: none;">
+          <div class="detected-biz-badge">Detected Business</div>
+          <div id="detected-biz-name" class="detected-biz-name">Clinic / Business</div>
+          <div id="detected-biz-address" class="detected-biz-address">Address Preview</div>
+          <div id="detected-biz-note" class="detected-biz-note" style="display: none;">
+            Detected with reduced confidence — confirm details below before extracting.
+          </div>
+          <button id="btn-use-detected-biz" type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;">
+            Use Current Business
+          </button>
+        </div>
+
+        <!-- Manual Business URL Block (PRD §6.2) -->
+        <div class="manual-url-block">
+          <label for="input-biz-url" class="field-label">Target Business URL</label>
+          <div class="url-input-group">
+            <input
+              id="input-biz-url"
+              type="text"
+              class="input-text"
+              placeholder="Paste Google Maps business URL..."
+            />
+            <button id="btn-load-biz-url" type="button" class="btn btn-secondary btn-sm" disabled>Load</button>
+          </div>
+          <div id="biz-url-error" class="error-msg" style="display: none;"></div>
+        </div>
+
+        <!-- Confirmed Target Display (PRD §18) -->
+        <div id="confirmed-target-card" class="confirmed-target-card" style="display: none;">
+          <div class="confirmed-header">Target Confirmed:</div>
+          <div id="target-biz-name" class="target-biz-title">-</div>
+          <div id="target-biz-url" class="target-biz-url text-secondary">-</div>
+        </div>
+
+        <!-- Scope Checkboxes -->
+        <div class="media-options-grid">
+          <label class="checkbox-label"><input type="checkbox" id="chk-photos" checked /> Photos</label>
+          <label class="checkbox-label"><input type="checkbox" id="chk-videos" checked /> Videos</label>
+          <label class="checkbox-label"><input type="checkbox" id="chk-reviews" checked /> Reviews</label>
+        </div>
+
+        <!-- Dual Track Progress (PRD §19) -->
+        <section id="media-progress-section" class="progress-section" style="display: none;">
+          <div class="track-row">
+            <div class="track-header">
+              <span class="track-title">Photos & Videos</span>
+              <span id="media-track-badge" class="chip chip-neutral" style="font-size: 11px;">IDLE</span>
+            </div>
+            <div class="track-count tabular-nums" id="media-track-fraction">0 / 0+</div>
+            <div class="progress-bar-container">
+              <div id="media-track-bar" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="track-row" style="margin-top: 10px;">
+            <div class="track-header">
+              <span class="track-title">Customer Reviews</span>
+              <span id="review-track-badge" class="chip chip-neutral" style="font-size: 11px;">IDLE</span>
+            </div>
+            <div class="track-count tabular-nums" id="review-track-fraction">0 / 0+</div>
+            <div class="progress-bar-container">
+              <div id="review-track-bar" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Media Controls -->
+        <section class="controls-section">
+          <button id="btn-media-start" type="button" class="btn btn-primary btn-full" disabled>
+            Start Extraction
+          </button>
+          <div id="media-running-controls" class="btn-group" style="display: none;">
+            <button id="btn-media-pause" type="button" class="btn btn-secondary">Pause</button>
+            <button id="btn-media-stop" type="button" class="btn btn-secondary">Stop</button>
+          </div>
+          <div id="media-paused-controls" class="btn-group" style="display: none;">
+            <button id="btn-media-resume" type="button" class="btn btn-primary">Resume</button>
+            <button id="btn-media-stop-paused" type="button" class="btn btn-secondary">Stop</button>
+          </div>
+        </section>
+
+        <!-- Media Export -->
+        <section class="export-section">
+          <div class="btn-group">
+            <button id="btn-export-media-csv" type="button" class="btn btn-secondary">Export Media CSV</button>
+            <button id="btn-export-reviews-csv" type="button" class="btn btn-secondary">Export Reviews CSV</button>
+          </div>
+          <button id="btn-export-combined-json" type="button" class="btn btn-primary btn-full" style="margin-top: 8px;">Export Combined JSON</button>
+          <button id="btn-media-open-dashboard" type="button" class="link-btn">Open Full Dashboard</button>
+        </section>
+      </div>
+    </main>
+
+    <!-- LinkedIn Connect Mode Panel (injected into main by popup.ts) -->
+    <div id="linkedin-mode-container" style="display: none; flex-direction: column; gap: var(--space-3);">
+
+      <!-- Status -->
+      <section class="search-section">
+        <div id="li-search-query" class="search-query" title="LinkedIn search query">No LinkedIn search page detected</div>
+        <div id="li-detected-count" class="detected-count">0 profiles discovered</div>
+      </section>
+
+      <!-- Alert -->
+      <div id="li-alert-banner" class="alert-banner" style="display: none;">
+        <span id="li-alert-icon"></span>
+        <div id="li-alert-text"></div>
+      </div>
+
+      <!-- Progress -->
+      <section class="progress-section">
+        <div class="progress-header">
+          <span class="progress-label">Progress</span>
+          <span id="li-progress-fraction" class="progress-fraction tabular-nums">0 / 0</span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="li-progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Connected</span>
+            <span id="li-stat-connected" class="stat-value text-success tabular-nums">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Skipped</span>
+            <span id="li-stat-skipped" class="stat-value text-warning tabular-nums">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Failed</span>
+            <span id="li-stat-failed" class="stat-value text-error tabular-nums">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Pending</span>
+            <span id="li-stat-pending" class="stat-value text-neutral tabular-nums">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Info pill -->
+      <div style="padding: 6px 8px; background: var(--color-surface-raised); border-radius: 6px; font-size: 10px; color: var(--color-text-secondary); line-height: 1.5;">
+        Connects to profiles with <strong>no website</strong> or <strong>social-only links</strong>. Profiles with a real website are skipped. Requests sent without a note.
+      </div>
+
+      <!-- Controls -->
+      <section class="controls-section">
+        <button id="li-btn-start" type="button" class="btn btn-primary btn-full">Start LinkedIn Connect</button>
+        <div id="li-running-controls" class="btn-group" style="display: none;">
+          <button id="li-btn-pause" type="button" class="btn btn-secondary">Pause</button>
+          <button id="li-btn-stop" type="button" class="btn btn-secondary">Stop</button>
+        </div>
+        <div id="li-paused-controls" class="btn-group" style="display: none;">
+          <button id="li-btn-resume" type="button" class="btn btn-primary">Resume</button>
+          <button id="li-btn-stop-paused" type="button" class="btn btn-secondary">Stop</button>
+        </div>
+      </section>
+
+      <!-- Export -->
+      <section class="export-section">
+        <div class="btn-group">
+          <button id="li-btn-export-csv" type="button" class="btn btn-secondary">Export CSV</button>
+          <button id="li-btn-export-json" type="button" class="btn btn-secondary">Export JSON</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <span id="footer-status">Ready · Data stored locally</span>
+    </footer>
+  </div>
+
+  <script type="module" src="popup.ts"></script>
+</body>
+</html>
