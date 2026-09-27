@@ -1,0 +1,34 @@
+{
+  "extensionName": {
+    "message": "Business Lead Extraction Tool",
+    "description": "The title of the extension"
+  },
+  "extensionDescription": {
+    "message": "Extracts structured, verified business leads from Google Maps search results with website classification and deduplication.",
+    "description": "The description of the extension"
+  },
+  "startExtraction": {
+    "message": "Start Extraction",
+    "description": "Start extraction button label"
+  },
+  "pauseExtraction": {
+    "message": "Pause",
+    "description": "Pause extraction button label"
+  },
+  "resumeExtraction": {
+    "message": "Resume",
+    "description": "Resume extraction button label"
+  },
+  "stopExtraction": {
+    "message": "Stop",
+    "description": "Stop extraction button label"
+  },
+  "exportCsv": {
+    "message": "Export CSV",
+    "description": "Export CSV button label"
+  },
+  "exportJson": {
+    "message": "Export JSON",
+    "description": "Export JSON button label"
+  }
+}
