@@ -1,0 +1,112 @@
+/**
+ * Options Page Styles
+ */
+
+.options-container {
+  max-width: 640px;
+  margin: var(--space-6) auto;
+  padding: 0 var(--space-4);
+}
+
+.options-header {
+  margin-bottom: var(--space-5);
+}
+
+.options-header h2 {
+  font-size: var(--text-page-title);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+.options-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.form-section {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.form-section h3 {
+  font-size: var(--text-emphasis);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.section-help {
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+  margin-top: -4px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-field label {
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.field-hint {
+  font-size: var(--text-micro);
+  color: var(--color-text-tertiary);
+}
+
+.input-field {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-tint);
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+.toast {
+  position: fixed;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  background-color: var(--color-text-primary);
+  color: #FFFFFF;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  font-size: var(--text-caption);
+}
