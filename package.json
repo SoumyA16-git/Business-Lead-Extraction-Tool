@@ -1,0 +1,27 @@
+{
+  "name": "business-lead-extraction-tool",
+  "version": "1.0.0",
+  "description": "Manifest V3 Chromium browser extension for structured Google Maps business lead extraction",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/build.js",
+    "build": "tsc --noEmit && node scripts/build.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "idb": "^8.0.2",
+    "lucide": "^1.16.0",
+    "preact": "^10.26.4"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.308",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^22.13.9",
+    "fake-indexeddb": "^6.1.0",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0",
+    "vitest": "^3.0.7"
+  }
+}
